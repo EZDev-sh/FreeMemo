@@ -27,6 +27,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         naviController.viewControllers.append(MemoListViewController())
         naviController.view.backgroundColor = .white
         naviController.navigationBar.prefersLargeTitles = true
+        naviController.navigationBar.tintColor = .systemOrange
         
         let rootViewController = naviController
         

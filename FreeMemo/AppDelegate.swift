@@ -28,6 +28,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let naviController = UINavigationController()
             naviController.viewControllers.append(MemoListViewController())
             naviController.view.backgroundColor = .white
+            naviController.navigationBar.tintColor = .systemOrange
+            
             if #available(iOS 11.0, *) {
                 naviController.navigationBar.prefersLargeTitles = true
             } else {
