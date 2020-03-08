@@ -39,6 +39,9 @@ class ImageCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
+        // 셀선택 효과 없애기
+        // create by EZDev on 2020.03.07
+        self.selectionStyle = .none
         initLayout()
     }
     
@@ -102,6 +105,9 @@ class LabelCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
+        // 셀선택 효과 없애기
+        // create by EZDev on 2020.03.07
+        self.selectionStyle = .none
         initLayout()
     }
     

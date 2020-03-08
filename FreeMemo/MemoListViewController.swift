@@ -24,6 +24,7 @@ class MemoListViewController: UIViewController {
         table.separatorStyle = .none
         table.rowHeight = UITableView.automaticDimension
         table.estimatedRowHeight = 120
+        
         return table
     }()
     
@@ -58,11 +59,12 @@ class MemoListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // memotableview 데이터, 셀 등록
-        // create by EZDev on 2020.03.05
+        // memotableview 데이터, 셀, 델리게이트 등록
+        // create by EZDev on 2020.03.07
         memoTableView.dataSource = self
         memoTableView.register(ImageCell.self, forCellReuseIdentifier: "imageCell")
         memoTableView.register(LabelCell.self, forCellReuseIdentifier: "labelCell")
+        memoTableView.delegate = self
 
     }
     
@@ -95,14 +97,19 @@ class MemoListViewController: UIViewController {
 // create by EZDev on 2020.03.05
 extension MemoListViewController {
     @objc func addMemo(_ sender: UIBarButtonItem) {
-        // 새로운 메모 화면으로 넘어가는 코드 작성 예정
-        print("add memo")
+        // 새로운 메모화면으로 넘어갈때 네비게이션을 감싸서 넘겨준다.
+        // create by on EZDev on 2020.03.07
+        let compose = UINavigationController(rootViewController: ComposeViewController())
+        compose.view.backgroundColor = .white
+        compose.navigationBar.tintColor = .systemOrange        
+        
+        present(compose, animated: true, completion: nil)
     }
 }
 
-// tableview에 필요한 데이터 처리
-// create by EZDev on 2020.03.05
-extension MemoListViewController: UITableViewDataSource {
+// tableview에 필요한 데이터, 델리게이트 구현
+// create by EZDev on 2020.03.07
+extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return titleName.count
     }
@@ -128,8 +135,10 @@ extension MemoListViewController: UITableViewDataSource {
             return cell
         }
         
-        
-        
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("click cell")
     }
     
     
