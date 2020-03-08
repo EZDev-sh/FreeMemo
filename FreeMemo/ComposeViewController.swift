@@ -10,6 +10,8 @@ import UIKit
 
 class ComposeViewController: UIViewController {
     
+    var isKeyboard: Bool = true
+    
     // 네비게이션바에 필요한 버튼 정의
     // create by EZDev on 2020.03.07
     lazy var cancelBtn: UIBarButtonItem = {
@@ -71,7 +73,7 @@ class ComposeViewController: UIViewController {
     }()
     
     lazy var keyboardBtn: UIBarButtonItem = {
-        let btn: UIBarButtonItem = UIBarButtonItem(image: UIImage(named: "show_keyboard"), style: .plain, target: self, action: #selector(keyboard(_:)))
+        let btn: UIBarButtonItem = UIBarButtonItem(image: UIImage(named: "hide_keyboard"), style: .plain, target: self, action: #selector(keyboard(_:)))
         
         return btn
     }()
@@ -104,6 +106,12 @@ class ComposeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        // 초기에 제목을 입력하수 있게 바로 키보드를 올린다.
+        // create by EZDev on 2020.03.08
+        titleTextField.becomeFirstResponder()
+        
+        // 키보드의 높이를 가져올수 있게 하는 노티를 등록한다
+        // create by EZDev on 2020.03.08
         NotificationCenter.default.addObserver(self, selector: #selector(showKeyboard(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
     }
 
@@ -122,6 +130,8 @@ class ComposeViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
+        // 화면이 사라질때 composeview에서 등록했던 모든 노티를 제거한다.
+        // create by EZDev on 2020.03.08
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -137,7 +147,7 @@ class ComposeViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             titleTextField.topAnchor.constraint(equalTo: guide.topAnchor, constant: 8),
-            titleTextField.leftAnchor.constraint(equalTo: guide.leftAnchor, constant: 20),
+            titleTextField.leftAnchor.constraint(equalTo: guide.leftAnchor, constant: 16),
             titleTextField.rightAnchor.constraint(equalTo: guide.rightAnchor, constant: -8),
             
             contentTextView.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 8),
@@ -173,16 +183,26 @@ class ComposeViewController: UIViewController {
         // 사진 추가되는거 구현 예정
     }
     
-    @objc func keyboard(_ sender: Any) {
-        // 키보드 컨트롤 구현 예정
+    // 키보드 버튼이 눌렸을때 키보드 on/off 기능
+    // create by EZDev on 2020.03.08
+    @objc func keyboard(_ sender: UIBarButtonItem) {
+        if isKeyboard {
+            isKeyboard = false
+            self.view.endEditing(true)
+            sender.image = UIImage(named: "show_keyboard")
+        }
+        else {
+            isKeyboard = true
+            contentTextView.becomeFirstResponder()
+            sender.image = UIImage(named: "hide_keyboard")
+        }
     }
     
     @objc func showKeyboard(_ noti: Notification) {
+        // 키보드의 크기를 가져와서 테이블뷰의 높이를 설정해준다.
+        // create by EZDev on 2020.03.08
         if let frame = noti.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let height = frame.cgRectValue.height
-            
-            print("keyboard height")
-            print(height)
             imageTableView.heightAnchor.constraint(equalToConstant: height).isActive = true
         }
     }
