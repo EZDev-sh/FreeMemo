@@ -100,6 +100,12 @@ class ComposeViewController: UIViewController {
         initConstraint()
         
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(showKeyboard(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -111,6 +117,12 @@ class ComposeViewController: UIViewController {
         imageTableView.delegate = self
         imageTableView.dataSource = self
         imageTableView.register(PictureCell.self, forCellReuseIdentifier: "pictureCell")
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        NotificationCenter.default.removeObserver(self)
     }
     
     func initConstraint() {
@@ -140,7 +152,7 @@ class ComposeViewController: UIViewController {
             imageTableView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
             imageTableView.leadingAnchor.constraint(equalTo: editToolBar.leadingAnchor),
             imageTableView.trailingAnchor.constraint(equalTo: editToolBar.trailingAnchor),
-            imageTableView.heightAnchor.constraint(equalToConstant: 200)
+            
             
             
         ])
@@ -164,16 +176,16 @@ class ComposeViewController: UIViewController {
     @objc func keyboard(_ sender: Any) {
         // 키보드 컨트롤 구현 예정
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    
+    @objc func showKeyboard(_ noti: Notification) {
+        if let frame = noti.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let height = frame.cgRectValue.height
+            
+            print("keyboard height")
+            print(height)
+            imageTableView.heightAnchor.constraint(equalToConstant: height).isActive = true
+        }
     }
-    */
 
 }
 
