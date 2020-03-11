@@ -50,9 +50,9 @@ class MemoListViewController: UIViewController {
         
         // 테스트를 위한 데이터 삽입
         // create by EZDev on 2020.03.06
-        img.append(UIImage(named: "notebook"))
-        titleName.append("this is image")
-        content.append("this is image content this is image content this is image content this is image content this is image content this is image content this is image content this is image content ")
+//        img.append(UIImage(named: "notebook"))
+//        titleName.append("this is image")
+//        content.append("this is image content this is image content this is image content this is image content this is image content this is image content this is image content this is image content ")
         
     }
 
@@ -65,7 +65,20 @@ class MemoListViewController: UIViewController {
         memoTableView.register(ImageCell.self, forCellReuseIdentifier: "imageCell")
         memoTableView.register(LabelCell.self, forCellReuseIdentifier: "labelCell")
         memoTableView.delegate = self
+        
+        // 싱글톤에 저장된 내용을 보기위한 노티 등록 및 테이블뷰 업데이트
+        // create by EZDev on 2020.03.11
+        NotificationCenter.default.addObserver(forName: ComposeViewController.newMemoDidInsert, object: nil, queue: OperationQueue.main) { [weak self] (noti) in
+            self?.memoTableView.reloadData()
+        }
 
+    }
+    
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        // MemoListViewController에 등록된 노티피케이션 모두 삭제
+        NotificationCenter.default.removeObserver(self)
     }
     
     
@@ -111,29 +124,47 @@ extension MemoListViewController {
 // create by EZDev on 2020.03.07
 extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return titleName.count
+        return DataMgr.shared.memoList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        // 이미지가 포함된 셀 혹은 텍스트로만 이루어진 셀의 분기를 나누는 테스트 코드
-        // create by EZDev on 2020.03.06
-        if img.count > indexPath.row, let image = img[indexPath.row] {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
+        let memo = DataMgr.shared.memoList[indexPath.row]
+        
+        if memo.images?.count == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath) as! LabelCell
 
-            cell.thumbnaile.image = image
-            cell.titleLabel.text = titleName[indexPath.row]
-            cell.contentLabel.text = content[indexPath.row]
+            cell.titleLabel.text = memo.title
+            cell.contentLabel.text = memo.content
+            
             return cell
         }
         else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath) as! LabelCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
 
-            cell.titleLabel.text = titleName[indexPath.row]
-            cell.contentLabel.text = content[indexPath.row]
-
+            cell.thumbnaile.image = memo.images?[0]
+            cell.titleLabel.text = memo.title
+            cell.contentLabel.text = memo.content
             return cell
         }
+        // 이미지가 포함된 셀 혹은 텍스트로만 이루어진 셀의 분기를 나누는 테스트 코드
+        // create by EZDev on 2020.03.06
+//        if img.count > indexPath.row, let image = img[indexPath.row] {
+//            let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
+//
+//            cell.thumbnaile.image = image
+//            cell.titleLabel.text = titleName[indexPath.row]
+//            cell.contentLabel.text = content[indexPath.row]
+//            return cell
+//        }
+//        else {
+//            let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath) as! LabelCell
+//
+//            cell.titleLabel.text = titleName[indexPath.row]
+//            cell.contentLabel.text = content[indexPath.row]
+//
+//            return cell
+//        }
         
     }
     

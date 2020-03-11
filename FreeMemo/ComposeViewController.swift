@@ -11,10 +11,18 @@ import Photos
 
 class ComposeViewController: UIViewController {
     
+    // 키보드 사용중인지 아닌지 확인 하는 아이템
+    // create by EZDev on 2020.03.11
     var isKeyboard: Bool = true
+    // 추가되는 이미지를 컨트롤 하는 아이템
+    // create by EZDev on 2020.03.11
     let picker: UIImagePickerController = UIImagePickerController()
     var addImages: [UIImage] = []
-    var addName: [String?] = []
+    var addName: [String] = []
+    
+    // 새로운 메모를 저장시켜줄 모델
+    // create by EZDev on 2020.03.11
+    var newMemo: Model = Model()
     
     // 네비게이션바에 필요한 버튼 정의
     // create by EZDev on 2020.03.07
@@ -182,6 +190,19 @@ class ComposeViewController: UIViewController {
     
     @objc func save(_ sender: Any) {
         // core data에 저장하는 코드 구현 예정
+        
+        // 싱글톤에 저장후 memolisview에 노티피케이션에 신호를 보낸다.
+        // create by EZDev on 2020.03.11
+        guard let title = titleTextField.text, let content = contentTextView.text else { return }
+        newMemo.title = title
+        newMemo.content = content
+        newMemo.imageName = addName
+        newMemo.images = addImages
+        
+        DataMgr.shared.memoList.append(newMemo)
+        NotificationCenter.default.post(name: ComposeViewController.newMemoDidInsert, object: nil)
+        
+        dismiss(animated: true, completion: nil)
     }
     
     // 사진을 추가하는 방식의 액션시트를 보여줍니다.
@@ -274,12 +295,15 @@ extension ComposeViewController: UITableViewDataSource, UITableViewDelegate {
     // create by EZDev on 2020.03.08
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return addImages.count
+//        return newMemo.images?.count ?? 0
     }
     
     // 셀에 보여질 아이템 업데이트
     // create by EZDev on 2020.03.08
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "pictureCell", for: indexPath) as! PictureCell
+        
+        
         
         cell.thumbnail.image = addImages[indexPath.row]
         cell.imageName.text = addName[indexPath.row]
@@ -326,12 +350,15 @@ extension ComposeViewController: UIImagePickerControllerDelegate, UINavigationCo
         
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             addImages.append(image)
+//            newMemo?.images?.append(image)
         }
         if let url = info[UIImagePickerController.InfoKey.referenceURL] as? URL {
             let asset = PHAsset.fetchAssets(withALAssetURLs: [url], options: nil)
             guard let firstObj = asset.firstObject else { return }
-            let fileName = PHAssetResource.assetResources(for: firstObj).first?.originalFilename
+            guard let fileName = PHAssetResource.assetResources(for: firstObj).first?.originalFilename else { return }
             
+            
+//            newMemo?.imageName?.append(fileName)
             addName.append(fileName)
         }
         else {
@@ -339,11 +366,20 @@ extension ComposeViewController: UIImagePickerControllerDelegate, UINavigationCo
             let date = Date()
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            
             addName.append(dateFormatter.string(from: date))
+//            newMemo?.imageName?.append(dateFormatter.string(from: date))
         }
         
         imageTableView.reloadData()
         
         dismiss(animated: true, completion: nil)
     }
+}
+
+
+// MemoListViewController에서 받을 노티피케이션 이름을 정의
+// create by EZDev on 2020.03.11
+extension ComposeViewController {
+    static let newMemoDidInsert = Notification.Name(rawValue: "newMemoDidInsert")
 }

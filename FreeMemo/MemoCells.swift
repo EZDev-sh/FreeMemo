@@ -59,7 +59,7 @@ class ImageCell: UITableViewCell {
         // 각 컴포넌트의 제약사항 추가
         // create by EZDev on 2020.03.06
         NSLayoutConstraint.activate([
-            self.thumbnaile.leftAnchor.constraint(equalTo: self.leftAnchor),
+            self.thumbnaile.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8),
             self.thumbnaile.topAnchor.constraint(equalTo: self.topAnchor, constant: 8),
             self.thumbnaile.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -8),
             self.thumbnaile.widthAnchor.constraint(equalToConstant: 100),
