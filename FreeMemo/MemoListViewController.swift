@@ -48,12 +48,6 @@ class MemoListViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // 테스트를 위한 데이터 삽입
-        // create by EZDev on 2020.03.06
-//        img.append(UIImage(named: "notebook"))
-//        titleName.append("this is image")
-//        content.append("this is image content this is image content this is image content this is image content this is image content this is image content this is image content this is image content ")
-        
     }
 
     override func viewDidLoad() {
@@ -113,8 +107,6 @@ extension MemoListViewController {
         // 새로운 메모화면으로 넘어갈때 네비게이션을 감싸서 넘겨준다.
         // create by on EZDev on 2020.03.07
         let compose = UINavigationController(rootViewController: ComposeViewController())
-        compose.view.backgroundColor = .white
-        compose.navigationBar.tintColor = .systemOrange        
         
         present(compose, animated: true, completion: nil)
     }
@@ -130,7 +122,8 @@ extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let memo = DataMgr.shared.memoList[indexPath.row]
-        
+        // 이미지가 포함된 셀 혹은 텍스트로만 이루어진 셀의 분기를 나누는 테스트 코드
+        // create by EZDev on 2020.03.06
         if memo.images?.count == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath) as! LabelCell
 
@@ -147,29 +140,19 @@ extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
             cell.contentLabel.text = memo.content
             return cell
         }
-        // 이미지가 포함된 셀 혹은 텍스트로만 이루어진 셀의 분기를 나누는 테스트 코드
-        // create by EZDev on 2020.03.06
-//        if img.count > indexPath.row, let image = img[indexPath.row] {
-//            let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
-//
-//            cell.thumbnaile.image = image
-//            cell.titleLabel.text = titleName[indexPath.row]
-//            cell.contentLabel.text = content[indexPath.row]
-//            return cell
-//        }
-//        else {
-//            let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath) as! LabelCell
-//
-//            cell.titleLabel.text = titleName[indexPath.row]
-//            cell.contentLabel.text = content[indexPath.row]
-//
-//            return cell
-//        }
+        
+
         
     }
     
+    // 선택한 셀의 정보를 ComposeViewController 로 보내 수정 가능한 환경으로 변경해준다.
+    // create by EZDev on 2020.03.12
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("click cell")
+        
+        let compose = ComposeViewController()
+        compose.editMemo = DataMgr.shared.memoList[indexPath.row]
+        
+        present(UINavigationController(rootViewController: compose), animated: true, completion: nil)
     }
     
     

@@ -24,6 +24,10 @@ class ComposeViewController: UIViewController {
     // create by EZDev on 2020.03.11
     var newMemo: Model = Model()
     
+    // 메모를 수정하기 위한 것인지 확인
+    // create by EZDev on 2020.03.12
+    var editMemo: Model?
+    
     // 네비게이션바에 필요한 버튼 정의
     // create by EZDev on 2020.03.07
     lazy var cancelBtn: UIBarButtonItem = {
@@ -93,6 +97,11 @@ class ComposeViewController: UIViewController {
     override func loadView() {
         super.loadView()
         
+        // ViewController에 기본 환경을 설정해준다.
+        // create by EZDev on 2020.03.12
+        view.backgroundColor = .white
+        navigationController?.navigationBar.tintColor = .systemOrange
+        
         // 화면에 컴포넌트 추가
         // create by EZDev on 2020.03.07
         view.addSubview(titleTextField)
@@ -100,9 +109,20 @@ class ComposeViewController: UIViewController {
         view.addSubview(editToolBar)
         view.addSubview(imageTableView)
         
-        // 네비게이션바 설정
-        // create by EZDev on 2020.03.07
-        navigationItem.title = "새로운 메모"
+        // 메모 수정을 위한 화면인지 새로운 메모를 작성할 화면인지 확인후 설정
+        // create by EZDev on 2020.03.12
+        if let memo = editMemo {
+            navigationItem.title = "메모 수정"
+            titleTextField.text = memo.title
+            contentTextView.text = memo.content
+            addImages = memo.images!
+            addName = memo.imageName!
+        }
+        else {
+            navigationItem.title = "새로운 메모"
+            
+        }
+        
         navigationItem.leftBarButtonItem = cancelBtn
         navigationItem.rightBarButtonItem = saveBtn
         
@@ -302,8 +322,6 @@ extension ComposeViewController: UITableViewDataSource, UITableViewDelegate {
     // create by EZDev on 2020.03.08
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "pictureCell", for: indexPath) as! PictureCell
-        
-        
         
         cell.thumbnail.image = addImages[indexPath.row]
         cell.imageName.text = addName[indexPath.row]
