@@ -120,8 +120,7 @@ class ComposeViewController: UIViewController {
             addName = memo.imageName!
         }
         else {
-            navigationItem.title = "새로운 메모"
-            
+            navigationItem.title = "새로운 메모"   
         }
         
         navigationItem.leftBarButtonItem = cancelBtn
@@ -161,6 +160,7 @@ class ComposeViewController: UIViewController {
         imageTableView.dataSource = self
         imageTableView.register(PictureCell.self, forCellReuseIdentifier: "pictureCell")
         picker.delegate = self
+        navigationController?.presentationController?.delegate = self
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -212,9 +212,8 @@ class ComposeViewController: UIViewController {
     @objc func save(_ sender: Any) {
         // core data에 저장하는 코드 구현 예정
         
-        // 싱글톤에 저장후 memolisview에 노티피케이션에 신호를 보낸다.
-        // create by EZDev on 2020.03.11
-        
+        // 싱글톤에 새로운 메모를 저장할지 기존 메모르 수정한것인지 확인후 실행
+        // create by EZDev on 2020.03.12
         if let target = editMemo {
             target.title = titleTextField.text
             target.content = contentTextView.text
@@ -378,15 +377,12 @@ extension ComposeViewController: UIImagePickerControllerDelegate, UINavigationCo
         
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             addImages.append(image)
-//            newMemo?.images?.append(image)
         }
         if let url = info[UIImagePickerController.InfoKey.referenceURL] as? URL {
             let asset = PHAsset.fetchAssets(withALAssetURLs: [url], options: nil)
             guard let firstObj = asset.firstObject else { return }
             guard let fileName = PHAssetResource.assetResources(for: firstObj).first?.originalFilename else { return }
-            
-            
-//            newMemo?.imageName?.append(fileName)
+
             addName.append(fileName)
         }
         else {
@@ -396,11 +392,9 @@ extension ComposeViewController: UIImagePickerControllerDelegate, UINavigationCo
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
             
             addName.append(dateFormatter.string(from: date))
-//            newMemo?.imageName?.append(dateFormatter.string(from: date))
         }
         
         imageTableView.reloadData()
-        
         dismiss(animated: true, completion: nil)
     }
 }
@@ -410,4 +404,23 @@ extension ComposeViewController: UIImagePickerControllerDelegate, UINavigationCo
 // create by EZDev on 2020.03.11
 extension ComposeViewController {
     static let newMemoDidInsert = Notification.Name(rawValue: "newMemoDidInsert")
+}
+
+// Modal로 올라와 있는 ComposeViewController를 아래로 스와이프 하여 닫을 경우 편집내용에대한 알림 메세지
+// create by EZDev on 2020.03.12
+extension ComposeViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidAttemptToDismiss(_ presentationController: UIPresentationController) {
+        let alert = UIAlertController(title: "편집창 알림", message: "편집한 내용을 저장할까요?", preferredStyle: .alert)
+        
+        let okAction = UIAlertAction(title: "확인", style: .default) { [weak self] (action) in
+            self?.save(action)
+        }
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel) { [weak self] (action) in
+            self?.cancel(action)
+        }
+        alert.addAction(okAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true, completion: nil)
+    }
 }
