@@ -151,6 +151,7 @@ extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
         
         let compose = ComposeViewController()
         compose.editMemo = DataMgr.shared.memoList[indexPath.row]
+        compose.index = indexPath.row
         
         present(UINavigationController(rootViewController: compose), animated: true, completion: nil)
     }

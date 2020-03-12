@@ -27,6 +27,7 @@ class ComposeViewController: UIViewController {
     // 메모를 수정하기 위한 것인지 확인
     // create by EZDev on 2020.03.12
     var editMemo: Model?
+    var index: Int?
     
     // 네비게이션바에 필요한 버튼 정의
     // create by EZDev on 2020.03.07
@@ -213,13 +214,22 @@ class ComposeViewController: UIViewController {
         
         // 싱글톤에 저장후 memolisview에 노티피케이션에 신호를 보낸다.
         // create by EZDev on 2020.03.11
-        guard let title = titleTextField.text, let content = contentTextView.text else { return }
-        newMemo.title = title
-        newMemo.content = content
-        newMemo.imageName = addName
-        newMemo.images = addImages
         
-        DataMgr.shared.memoList.append(newMemo)
+        if let target = editMemo {
+            target.title = titleTextField.text
+            target.content = contentTextView.text
+            target.images = addImages
+            target.imageName = addName
+            DataMgr.shared.memoList[index!] = target
+            
+        } else {
+            newMemo.title = titleTextField.text
+            newMemo.content = contentTextView.text
+            newMemo.imageName = addName
+            newMemo.images = addImages
+            DataMgr.shared.memoList.append(newMemo)
+        }
+        
         NotificationCenter.default.post(name: ComposeViewController.newMemoDidInsert, object: nil)
         
         dismiss(animated: true, completion: nil)
