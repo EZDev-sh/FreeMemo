@@ -10,7 +10,6 @@
 		7802DA22241374AB00BA33DE /* ComposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7802DA21241374AB00BA33DE /* ComposeViewController.swift */; };
 		785ABA952410D8DA00FCD0DE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785ABA942410D8DA00FCD0DE /* AppDelegate.swift */; };
 		785ABA972410D8DA00FCD0DE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785ABA962410D8DA00FCD0DE /* SceneDelegate.swift */; };
-		785ABA9F2410D8DA00FCD0DE /* FreeMemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 785ABA9D2410D8DA00FCD0DE /* FreeMemo.xcdatamodeld */; };
 		785ABAA12410D8DA00FCD0DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 785ABAA02410D8DA00FCD0DE /* Assets.xcassets */; };
 		785ABAA42410D8DA00FCD0DE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 785ABAA22410D8DA00FCD0DE /* LaunchScreen.storyboard */; };
 		788C49542418D6B800D42A15 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788C49532418D6B800D42A15 /* Model.swift */; };
@@ -24,7 +23,6 @@
 		785ABA912410D8DA00FCD0DE /* FreeMemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeMemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		785ABA942410D8DA00FCD0DE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		785ABA962410D8DA00FCD0DE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		785ABA9E2410D8DA00FCD0DE /* FreeMemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FreeMemo.xcdatamodel; sourceTree = "<group>"; };
 		785ABAA02410D8DA00FCD0DE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		785ABAA32410D8DA00FCD0DE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		785ABAA52410D8DA00FCD0DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -71,7 +69,6 @@
 				785ABAA02410D8DA00FCD0DE /* Assets.xcassets */,
 				785ABAA22410D8DA00FCD0DE /* LaunchScreen.storyboard */,
 				785ABAA52410D8DA00FCD0DE /* Info.plist */,
-				785ABA9D2410D8DA00FCD0DE /* FreeMemo.xcdatamodeld */,
 				7802DA21241374AB00BA33DE /* ComposeViewController.swift */,
 				78E0D9E12414CCCB000452AD /* PictureCell.swift */,
 				788C49532418D6B800D42A15 /* Model.swift */,
@@ -150,7 +147,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				789A28A32410E4F9008DCD4B /* MemoListViewController.swift in Sources */,
-				785ABA9F2410D8DA00FCD0DE /* FreeMemo.xcdatamodeld in Sources */,
 				785ABA952410D8DA00FCD0DE /* AppDelegate.swift in Sources */,
 				7802DA22241374AB00BA33DE /* ComposeViewController.swift in Sources */,
 				785ABA972410D8DA00FCD0DE /* SceneDelegate.swift in Sources */,
@@ -348,19 +344,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		785ABA9D2410D8DA00FCD0DE /* FreeMemo.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				785ABA9E2410D8DA00FCD0DE /* FreeMemo.xcdatamodel */,
-			);
-			currentVersion = 785ABA9E2410D8DA00FCD0DE /* FreeMemo.xcdatamodel */;
-			path = FreeMemo.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 785ABA892410D8D900FCD0DE /* Project object */;
 }
