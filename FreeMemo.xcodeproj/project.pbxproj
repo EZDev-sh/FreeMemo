@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7802DA22241374AB00BA33DE /* ComposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7802DA21241374AB00BA33DE /* ComposeViewController.swift */; };
+		7858726B241E2AB000A82F69 /* Pods_FreeMemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 938C13D3C74E6BC750018E95 /* Pods_FreeMemo.framework */; };
 		785ABA952410D8DA00FCD0DE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785ABA942410D8DA00FCD0DE /* AppDelegate.swift */; };
 		785ABA972410D8DA00FCD0DE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785ABA962410D8DA00FCD0DE /* SceneDelegate.swift */; };
 		785ABAA12410D8DA00FCD0DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 785ABAA02410D8DA00FCD0DE /* Assets.xcassets */; };
@@ -16,7 +17,6 @@
 		789A28A32410E4F9008DCD4B /* MemoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 789A28A22410E4F9008DCD4B /* MemoListViewController.swift */; };
 		789A28A92410F576008DCD4B /* MemoCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 789A28A82410F576008DCD4B /* MemoCells.swift */; };
 		78E0D9E22414CCCB000452AD /* PictureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E0D9E12414CCCB000452AD /* PictureCell.swift */; };
-		BAB349F05BC5465ACE4A74B1 /* Pods_FreeMemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 938C13D3C74E6BC750018E95 /* Pods_FreeMemo.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,7 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BAB349F05BC5465ACE4A74B1 /* Pods_FreeMemo.framework in Frameworks */,
+				7858726B241E2AB000A82F69 /* Pods_FreeMemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
