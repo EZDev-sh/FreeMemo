@@ -48,7 +48,7 @@ class MemoListViewController: UIViewController {
         view.addSubview(memoTableView)
         
         initConstraint()
-
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -63,7 +63,7 @@ class MemoListViewController: UIViewController {
         loadData()
         
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -115,7 +115,7 @@ class MemoListViewController: UIViewController {
         memoArray = realm?.objects(Memo.self)
         memoTableView.reloadData()
     }
-
+    
 }
 
 // 액션에 관한 모든 것을 관리 합니다.
@@ -135,11 +135,11 @@ extension MemoListViewController {
 extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return memoArray?.count ?? 0
-//        return DataMgr.shared.memoList.count
+        //        return DataMgr.shared.memoList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
+        
         
         let memo = memoArray?[indexPath.row]
         
@@ -164,14 +164,31 @@ extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
     // 선택한 셀의 정보를 ComposeViewController 로 보내 수정 가능한 환경으로 변경해준다.
     // create by EZDev on 2020.03.12
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-
+        
         let compose = ComposeViewController()
         guard let memo = memoArray?[indexPath.row] else { return }
         
         compose.editMemo = memo
         
-
+        
         present(UINavigationController(rootViewController: compose), animated: true, completion: nil)
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let delete = UITableViewRowAction(style: .destructive, title: "삭제") { (action, indexPath) in
+            
+            do {
+                try self.realm?.write {
+                    self.realm?.delete(self.memoArray![indexPath.row])
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
+            
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            
+        }
+        return [delete]
     }
     
     
