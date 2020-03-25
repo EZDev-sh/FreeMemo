@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RealmSwift
 
 class MemoListViewController: UIViewController {
     
@@ -32,6 +33,11 @@ class MemoListViewController: UIViewController {
     var titleName: [String] = []
     var content: [String] = []
     
+    var memoArray: Results<Memo>?
+    var realm: Realm?
+    
+    
+    
     // 화면에 보여질 컴포넌트들 추가
     // create by EZDev on 2020.03.05
     override func loadView() {
@@ -47,6 +53,14 @@ class MemoListViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        do {
+            realm = try Realm()
+        } catch {
+            print(error.localizedDescription)
+        }
+        print(NSHomeDirectory())
+        loadData()
         
     }
 
@@ -65,7 +79,6 @@ class MemoListViewController: UIViewController {
         NotificationCenter.default.addObserver(forName: ComposeViewController.newMemoDidInsert, object: nil, queue: OperationQueue.main) { [weak self] (noti) in
             self?.memoTableView.reloadData()
         }
-
     }
     
     
@@ -97,6 +110,11 @@ class MemoListViewController: UIViewController {
         ])
         
     }
+    
+    func loadData() {
+        memoArray = realm?.objects(Memo.self)
+        memoTableView.reloadData()
+    }
 
 }
 
@@ -116,43 +134,43 @@ extension MemoListViewController {
 // create by EZDev on 2020.03.07
 extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return DataMgr.shared.memoList.count
+        return memoArray?.count ?? 0
+//        return DataMgr.shared.memoList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let memo = DataMgr.shared.memoList[indexPath.row]
-        // 이미지가 포함된 셀 혹은 텍스트로만 이루어진 셀의 분기를 나누는 테스트 코드
-        // create by EZDev on 2020.03.06
-        if memo.images?.count == 0 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath) as! LabelCell
 
-            cell.titleLabel.text = memo.title
-            cell.contentLabel.text = memo.content
+        
+        let memo = memoArray?[indexPath.row]
+        
+        if memo?.imageArray.count != 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
+            
+            cell.thumbnaile.image = UIImage(data: (memo?.imageArray[0].imageData)!)
+            cell.titleLabel.text = memo?.title
+            cell.contentLabel.text = memo?.content
             
             return cell
         }
         else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
-
-            cell.thumbnaile.image = memo.images?[0]
-            cell.titleLabel.text = memo.title
-            cell.contentLabel.text = memo.content
+            let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath) as! LabelCell
+            cell.titleLabel.text = memo?.title
+            cell.contentLabel.text = memo?.content
             return cell
         }
-        
-
         
     }
     
     // 선택한 셀의 정보를 ComposeViewController 로 보내 수정 가능한 환경으로 변경해준다.
     // create by EZDev on 2020.03.12
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+
         let compose = ComposeViewController()
-        compose.editMemo = DataMgr.shared.memoList[indexPath.row]
-        compose.index = indexPath.row
+        guard let memo = memoArray?[indexPath.row] else { return }
         
+        compose.editMemo = memo
+        
+
         present(UINavigationController(rootViewController: compose), animated: true, completion: nil)
     }
     

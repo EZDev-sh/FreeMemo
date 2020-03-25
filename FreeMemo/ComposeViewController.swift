@@ -8,6 +8,7 @@
 
 import UIKit
 import Photos
+import RealmSwift
 
 class ComposeViewController: UIViewController {
     
@@ -17,17 +18,12 @@ class ComposeViewController: UIViewController {
     // 추가되는 이미지를 컨트롤 하는 아이템
     // create by EZDev on 2020.03.11
     let picker: UIImagePickerController = UIImagePickerController()
-    var addImages: [UIImage] = []
-    var addName: [String] = []
     
-    // 새로운 메모를 저장시켜줄 모델
-    // create by EZDev on 2020.03.11
-    var newMemo: Model = Model()
-    
-    // 메모를 수정하기 위한 것인지 확인
-    // create by EZDev on 2020.03.12
-    var editMemo: Model?
-    var index: Int?
+    var editMemo: Memo?
+    var newMemo: Memo?
+    var memo: Memo?
+    var newMemoMode: Bool = false
+    var realm: Realm?
     
     // 네비게이션바에 필요한 버튼 정의
     // create by EZDev on 2020.03.07
@@ -95,6 +91,8 @@ class ComposeViewController: UIViewController {
         return btn
     }()
     
+    
+    
     override func loadView() {
         super.loadView()
         
@@ -109,19 +107,6 @@ class ComposeViewController: UIViewController {
         view.addSubview(contentTextView)
         view.addSubview(editToolBar)
         view.addSubview(imageTableView)
-        
-        // 메모 수정을 위한 화면인지 새로운 메모를 작성할 화면인지 확인후 설정
-        // create by EZDev on 2020.03.12
-        if let memo = editMemo {
-            navigationItem.title = "메모 수정"
-            titleTextField.text = memo.title
-            contentTextView.text = memo.content
-            addImages = memo.images!
-            addName = memo.imageName!
-        }
-        else {
-            navigationItem.title = "새로운 메모"   
-        }
         
         navigationItem.leftBarButtonItem = cancelBtn
         navigationItem.rightBarButtonItem = saveBtn
@@ -147,6 +132,28 @@ class ComposeViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(showKeyboard(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         view.endEditing(true)
+        
+        do {
+            realm = try Realm()
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+        // 새로운 매모작성인지 수정인지 확인
+        // create by EZDev on 2020.03.23
+        if let tempMemo = editMemo {
+            navigationItem.title = "메모 수정"
+            titleTextField.text = tempMemo.title
+            contentTextView.text = tempMemo.content
+            imageTableView.reloadData()
+            
+            memo = tempMemo
+        } else {
+            memo = Memo()
+            newMemoMode = true
+            navigationItem.title = "새로운 메모"
+        }
+        
     }
 
     override func viewDidLoad() {
@@ -209,24 +216,43 @@ class ComposeViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
+    
+    // 사진을 Realm에 저장한다.
+    // create by EZDev on 2020.03,25
+    func savePicture(pic: Picture) {
+        do {
+            try realm?.write {
+                self.memo?.imageArray.append(pic)
+            }
+        } catch {
+            print(error)
+        }
+        imageTableView.reloadData()
+    }
+    
+    // 작성한 메모를 Realm에 저장한다.
+    // create by EZDev on 2020.03.25
     @objc func save(_ sender: Any) {
-        // core data에 저장하는 코드 구현 예정
-        
-        // 싱글톤에 새로운 메모를 저장할지 기존 메모르 수정한것인지 확인후 실행
-        // create by EZDev on 2020.03.12
-        if let target = editMemo {
-            target.title = titleTextField.text
-            target.content = contentTextView.text
-            target.images = addImages
-            target.imageName = addName
-            DataMgr.shared.memoList[index!] = target
-            
-        } else {
-            newMemo.title = titleTextField.text
-            newMemo.content = contentTextView.text
-            newMemo.imageName = addName
-            newMemo.images = addImages
-            DataMgr.shared.memoList.append(newMemo)
+        if newMemoMode {
+            memo?.title = titleTextField.text!
+            memo?.content = contentTextView.text
+            do {
+                try realm?.write {
+                    realm?.add(memo!)
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        else {
+            do {
+                try realm?.write {
+                    editMemo?.title = titleTextField.text!
+                    editMemo?.content = contentTextView.text
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
         }
         
         NotificationCenter.default.post(name: ComposeViewController.newMemoDidInsert, object: nil)
@@ -260,9 +286,9 @@ class ComposeViewController: UIViewController {
         }
     }
     
+    // 키보드의 크기를 가져와서 테이블뷰의 높이를 설정해준다.
+    // create by EZDev on 2020.03.08
     @objc func showKeyboard(_ noti: Notification) {
-        // 키보드의 크기를 가져와서 테이블뷰의 높이를 설정해준다.
-        // create by EZDev on 2020.03.08
         if let frame = noti.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let height = frame.cgRectValue.height
             imageTableView.heightAnchor.constraint(equalToConstant: height).isActive = true
@@ -290,6 +316,7 @@ class ComposeViewController: UIViewController {
         
         present(alert, animated: true, completion: nil)
     }
+    
 
 }
 
@@ -323,8 +350,7 @@ extension ComposeViewController: UITableViewDataSource, UITableViewDelegate {
     // 테이블에 표현할 셀의 갯수
     // create by EZDev on 2020.03.08
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return addImages.count
-//        return newMemo.images?.count ?? 0
+        return (memo?.imageArray.count) ?? 0
     }
     
     // 셀에 보여질 아이템 업데이트
@@ -332,20 +358,28 @@ extension ComposeViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "pictureCell", for: indexPath) as! PictureCell
         
-        cell.thumbnail.image = addImages[indexPath.row]
-        cell.imageName.text = addName[indexPath.row]
+        let picture = memo?.imageArray[indexPath.row]
+        cell.thumbnail.image = UIImage(data: picture!.imageData)
+        cell.imageName.text = picture?.name
         
         return cell
     }
     
-    // 추가된 이미지셀을 삭제
-    // create by EZDev on 2020.03.08
+    // db에 추가했던 이미지 셀 삭제
+    // create by EZDev on 2020.03.23
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         let delete = UITableViewRowAction(style: .destructive, title: "삭제") { (action, indexPath) in
-            self.addImages.remove(at: indexPath.row)
-            self.addName.remove(at: indexPath.row)
+            
+            do {
+                try self.realm?.write {
+                    self.realm?.delete((self.memo?.imageArray[indexPath.row])!)
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
+            
             tableView.deleteRows(at: [indexPath], with: .fade)
-            print(self.addName)
+            
         }
         return [delete]
     }
@@ -371,30 +405,43 @@ extension ComposeViewController: UIImagePickerControllerDelegate, UINavigationCo
         present(picker, animated: true, completion: nil)
     }
     
+    
+    
     // 앨범에서 선택한 이미지와 이미지 이름을 배열에 저장한다.
     // creat by EZDev on 2020.03.08
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
+        var imageName: String
+        var imageData: Data?
+        
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            addImages.append(image)
+            // Realm에 저장하기위한 image jpeg 데이터로 변환
+            // create by EZDev on 2020.03.23
+            imageData = image.jpegData(compressionQuality: 0.1)
         }
         if let url = info[UIImagePickerController.InfoKey.referenceURL] as? URL {
             let asset = PHAsset.fetchAssets(withALAssetURLs: [url], options: nil)
             guard let firstObj = asset.firstObject else { return }
             guard let fileName = PHAssetResource.assetResources(for: firstObj).first?.originalFilename else { return }
-
-            addName.append(fileName)
+            imageName = fileName
         }
         else {
             // 카메라 접근시 날짜로 이름을 설정후 배열에 저장한다.
             let date = Date()
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            
-            addName.append(dateFormatter.string(from: date))
+            imageName = dateFormatter.string(from: date)
         }
         
-        imageTableView.reloadData()
+        // 새로운 객체를 만든다.
+        // create by EZDev on 2020.03.23
+        let picture = Picture()
+        picture.imageData = imageData!
+        picture.name = imageName
+        
+        savePicture(pic: picture)
+        
+        
         dismiss(animated: true, completion: nil)
     }
 }

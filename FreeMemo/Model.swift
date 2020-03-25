@@ -27,17 +27,19 @@ class DataMgr {
 
 // RealmSwift를 사용한 데이터 모델
 // create by EZDev on 2020.03.15
-//
-//import RealmSwift
-//
-//class Memo: Object {
-//    @objc dynamic var title: String = ""
-//    @objc dynamic var content: String = ""
-//    
-//    let imageArray: List<Picture> = List<Picture>()
-//}
-//
-//class Picture: Object {
-//    @objc dynamic var name: String = ""
-//    @objc dynamic var imageData: Data = Data()
-//}
+
+import RealmSwift
+
+class Memo: Object {
+    
+    @objc dynamic var title: String = ""
+    @objc dynamic var content: String = ""
+    
+    
+    let imageArray: List<Picture> = List<Picture>()
+}
+
+class Picture: Object {
+    @objc dynamic var name: String = ""
+    @objc dynamic var imageData: Data = Data()
+}
