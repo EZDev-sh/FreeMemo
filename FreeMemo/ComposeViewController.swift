@@ -8,7 +8,6 @@
 
 import UIKit
 
-import RealmSwift
 
 class ComposeViewController: UIViewController {
     
@@ -20,10 +19,8 @@ class ComposeViewController: UIViewController {
     let picker: UIImagePickerController = UIImagePickerController()
     
     var editMemo: Memo?
-    var newMemo: Memo?
     var memo: Memo?
     var newMemoMode: Bool = false
-    var realm: Realm?
     
     // 네비게이션바에 필요한 버튼 정의
     // create by EZDev on 2020.03.07
