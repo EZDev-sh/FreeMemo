@@ -7,8 +7,6 @@
 //
 
 import UIKit
-import RealmSwift
-
 class MemoListViewController: UIViewController {
     
     // 필요한 컴포넌트 정의
@@ -28,16 +26,7 @@ class MemoListViewController: UIViewController {
         
         return table
     }()
-    
-    var img: [UIImage?] = []
-    var titleName: [String] = []
-    var content: [String] = []
-    
-    var memoArray: Results<Memo>?
-    var realm: Realm?
-    
-    
-    
+ 
     // 화면에 보여질 컴포넌트들 추가
     // create by EZDev on 2020.03.05
     override func loadView() {
@@ -54,14 +43,8 @@ class MemoListViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        do {
-            realm = try Realm()
-        } catch {
-            print(error.localizedDescription)
-        }
-        print(NSHomeDirectory())
-        loadData()
-        
+        // singleton의 데이터 업데이트
+        DataMgr.shared.loadMemoList()
     }
     
     override func viewDidLoad() {
@@ -111,11 +94,6 @@ class MemoListViewController: UIViewController {
         
     }
     
-    func loadData() {
-        memoArray = realm?.objects(Memo.self)
-        memoTableView.reloadData()
-    }
-    
 }
 
 // 액션에 관한 모든 것을 관리 합니다.
@@ -134,22 +112,20 @@ extension MemoListViewController {
 // create by EZDev on 2020.03.07
 extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return memoArray?.count ?? 0
-        //        return DataMgr.shared.memoList.count
+        return DataMgr.shared.memoList?.count ?? 0
+
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        
-        let memo = memoArray?[indexPath.row]
-        
+        let memo = DataMgr.shared.memoList?[indexPath.row]
         if memo?.imageArray.count != 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
-            
+
             cell.thumbnaile.image = UIImage(data: (memo?.imageArray[0].imageData)!)
             cell.titleLabel.text = memo?.title
             cell.contentLabel.text = memo?.content
-            
+
             return cell
         }
         else {
@@ -166,7 +142,9 @@ extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let compose = ComposeViewController()
-        guard let memo = memoArray?[indexPath.row] else { return }
+        // singleton 적용
+        // create by EZDev on 2020.03.27
+        guard let memo = DataMgr.shared.memoList?[indexPath.row] else { return }
         
         compose.editMemo = memo
         
@@ -177,20 +155,10 @@ extension MemoListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         let delete = UITableViewRowAction(style: .destructive, title: "삭제") { (action, indexPath) in
             
-            do {
-                try self.realm?.write {
-                    self.realm?.delete(self.memoArray![indexPath.row])
-                }
-            } catch {
-                print(error.localizedDescription)
-            }
-            
+            DataMgr.shared.deleteMemo(index: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
             
         }
         return [delete]
     }
-    
-    
 }
-

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Photos
+
 import RealmSwift
 
 class ComposeViewController: UIViewController {
@@ -133,11 +133,11 @@ class ComposeViewController: UIViewController {
         
         view.endEditing(true)
         
-        do {
-            realm = try Realm()
-        } catch {
-            print(error.localizedDescription)
-        }
+//        do {
+//            realm = try Realm()
+//        } catch {
+//            print(error.localizedDescription)
+//        }
         
         // 새로운 매모작성인지 수정인지 확인
         // create by EZDev on 2020.03.23
@@ -167,7 +167,6 @@ class ComposeViewController: UIViewController {
         imageTableView.dataSource = self
         imageTableView.register(PictureCell.self, forCellReuseIdentifier: "pictureCell")
         picker.delegate = self
-        navigationController?.presentationController?.delegate = self
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -208,89 +207,18 @@ class ComposeViewController: UIViewController {
   
         ])
     }
-    
-    
-    // 기존 화면으로 되돌아가기
-    // create by EZDev on 2020.03.07
-    @objc func cancel(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    
-    // 사진을 Realm에 저장한다.
-    // create by EZDev on 2020.03,25
-    func savePicture(pic: Picture) {
-        do {
-            try realm?.write {
-                self.memo?.imageArray.append(pic)
-            }
-        } catch {
-            print(error)
-        }
-        imageTableView.reloadData()
-    }
-    
-    // 작성한 메모를 Realm에 저장한다.
-    // create by EZDev on 2020.03.25
-    @objc func save(_ sender: Any) {
-        if newMemoMode {
-            memo?.title = titleTextField.text!
-            memo?.content = contentTextView.text
-            do {
-                try realm?.write {
-                    realm?.add(memo!)
-                }
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-        else {
-            do {
-                try realm?.write {
-                    editMemo?.title = titleTextField.text!
-                    editMemo?.content = contentTextView.text
-                }
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-        
-        NotificationCenter.default.post(name: ComposeViewController.newMemoDidInsert, object: nil)
-        
-        dismiss(animated: true, completion: nil)
-    }
-    
-    // 사진을 추가하는 방식의 액션시트를 보여줍니다.
-    // create by EZDev on 2020.03.08
-    @objc func picture(_ sender: Any) {
-        if isKeyboard {
-            isKeyboard = false
-            view.endEditing(true)
-            keyboardBtn.image = UIImage(named: "show_keyboard")
-        }
-        showAlert()
-    }
-    
-    // 키보드 버튼이 눌렸을때 키보드 on/off 기능
-    // create by EZDev on 2020.03.08
-    @objc func keyboard(_ sender: UIBarButtonItem) {
-        if isKeyboard {
-            isKeyboard = false
-            self.view.endEditing(true)
-            sender.image = UIImage(named: "show_keyboard")
-        }
-        else {
-            isKeyboard = true
-            contentTextView.becomeFirstResponder()
-            sender.image = UIImage(named: "hide_keyboard")
-        }
-    }
+
     
     // 키보드의 크기를 가져와서 테이블뷰의 높이를 설정해준다.
-    // create by EZDev on 2020.03.08
+    // create by EZDev on 2020.03.27
     @objc func showKeyboard(_ noti: Notification) {
         if let frame = noti.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
-            let height = frame.cgRectValue.height
+            var height = frame.cgRectValue.height
+            if #available(iOS 11.0, *) {
+                // 모든 뷰가 safearea영역이 있을경우의 높이 조정
+                // create by EZDev on 2020.03.27
+                height -= self.view.safeAreaInsets.bottom
+            }
             imageTableView.heightAnchor.constraint(equalToConstant: height).isActive = true
         }
     }
@@ -316,8 +244,6 @@ class ComposeViewController: UIViewController {
         
         present(alert, animated: true, completion: nil)
     }
-    
-
 }
 
 // textview에 placeholde 기능을 구현
@@ -369,105 +295,74 @@ extension ComposeViewController: UITableViewDataSource, UITableViewDelegate {
     // create by EZDev on 2020.03.23
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         let delete = UITableViewRowAction(style: .destructive, title: "삭제") { (action, indexPath) in
-            
-            do {
-                try self.realm?.write {
-                    self.realm?.delete((self.memo?.imageArray[indexPath.row])!)
-                }
-            } catch {
-                print(error.localizedDescription)
+
+            if let sendMemo = self.memo {
+                DataMgr.shared.deletePicture(memo: sendMemo, index: indexPath.row)
             }
-            
             tableView.deleteRows(at: [indexPath], with: .fade)
-            
         }
         return [delete]
     }
 
 }
 
-// 앨범, 카메라 접근 컨트롤
-// create by EZDev on 2020.03.08
-extension ComposeViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    // 앨범 접근후 화면에 보여주기
-    // create by EZDev on 2020.03.08
-    func openAlbum() {
-        picker.sourceType = .photoLibrary
-        
-        present(picker, animated: true, completion: nil)
-    }
-    
-    // 카메라 접근후 화면에 보여주기
-    // creat by EZDev on 2020.03.08
-    func openCam() {
-        picker.sourceType = .camera
-        
-        present(picker, animated: true, completion: nil)
-    }
-    
-    
-    
-    // 앨범에서 선택한 이미지와 이미지 이름을 배열에 저장한다.
-    // creat by EZDev on 2020.03.08
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        
-        var imageName: String
-        var imageData: Data?
-        
-        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            // Realm에 저장하기위한 image jpeg 데이터로 변환
-            // create by EZDev on 2020.03.23
-            imageData = image.jpegData(compressionQuality: 0.1)
-        }
-        if let url = info[UIImagePickerController.InfoKey.referenceURL] as? URL {
-            let asset = PHAsset.fetchAssets(withALAssetURLs: [url], options: nil)
-            guard let firstObj = asset.firstObject else { return }
-            guard let fileName = PHAssetResource.assetResources(for: firstObj).first?.originalFilename else { return }
-            imageName = fileName
-        }
-        else {
-            // 카메라 접근시 날짜로 이름을 설정후 배열에 저장한다.
-            let date = Date()
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            imageName = dateFormatter.string(from: date)
-        }
-        
-        // 새로운 객체를 만든다.
-        // create by EZDev on 2020.03.23
-        let picture = Picture()
-        picture.imageData = imageData!
-        picture.name = imageName
-        
-        savePicture(pic: picture)
-        
-        
-        dismiss(animated: true, completion: nil)
-    }
-}
-
-
 // MemoListViewController에서 받을 노티피케이션 이름을 정의
+// click 액션에대한 정의
 // create by EZDev on 2020.03.11
 extension ComposeViewController {
     static let newMemoDidInsert = Notification.Name(rawValue: "newMemoDidInsert")
-}
-
-// Modal로 올라와 있는 ComposeViewController를 아래로 스와이프 하여 닫을 경우 편집내용에대한 알림 메세지
-// create by EZDev on 2020.03.12
-extension ComposeViewController: UIAdaptivePresentationControllerDelegate {
-    func presentationControllerDidAttemptToDismiss(_ presentationController: UIPresentationController) {
-        let alert = UIAlertController(title: "편집창 알림", message: "편집한 내용을 저장할까요?", preferredStyle: .alert)
-        
-        let okAction = UIAlertAction(title: "확인", style: .default) { [weak self] (action) in
-            self?.save(action)
+    
+    // 기존 화면으로 되돌아가기
+    // create by EZDev on 2020.03.07
+    @objc func cancel(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    // 작성한 메모를 Realm에 저장한다.
+    // create by EZDev on 2020.03.25
+    @objc func save(_ sender: Any) {
+        if newMemoMode {
+            memo?.title = titleTextField.text!
+            memo?.content = contentTextView.text
+            
+            if let sendMemo = memo {
+                DataMgr.shared.addNewMemo(memo: sendMemo)
+            }
         }
-        let cancelAction = UIAlertAction(title: "취소", style: .cancel) { [weak self] (action) in
-            self?.cancel(action)
+        else {
+            if let sendMemo = editMemo {
+                DataMgr.shared.modifyMemo(memo: sendMemo, title: titleTextField.text!, content: contentTextView.text)
+            }
         }
-        alert.addAction(okAction)
-        alert.addAction(cancelAction)
         
-        present(alert, animated: true, completion: nil)
+        NotificationCenter.default.post(name: ComposeViewController.newMemoDidInsert, object: nil)
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
+    // 사진을 추가하는 방식의 액션시트를 보여줍니다.
+    // create by EZDev on 2020.03.08
+    @objc func picture(_ sender: Any) {
+        if isKeyboard {
+            isKeyboard = false
+            view.endEditing(true)
+            keyboardBtn.image = UIImage(named: "show_keyboard")
+        }
+        showAlert()
+    }
+    
+    // 키보드 버튼이 눌렸을때 키보드 on/off 기능
+    // create by EZDev on 2020.03.08
+    @objc func keyboard(_ sender: UIBarButtonItem) {
+        if isKeyboard {
+            isKeyboard = false
+            self.view.endEditing(true)
+            sender.image = UIImage(named: "show_keyboard")
+        }
+        else {
+            isKeyboard = true
+            contentTextView.becomeFirstResponder()
+            sender.image = UIImage(named: "hide_keyboard")
+        }
     }
 }

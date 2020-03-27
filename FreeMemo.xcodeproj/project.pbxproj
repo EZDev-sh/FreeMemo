@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7802DA22241374AB00BA33DE /* ComposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7802DA21241374AB00BA33DE /* ComposeViewController.swift */; };
+		78042245242DCB3700F9A82A /* AddPictureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78042244242DCB3700F9A82A /* AddPictureController.swift */; };
 		7858726B241E2AB000A82F69 /* Pods_FreeMemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 938C13D3C74E6BC750018E95 /* Pods_FreeMemo.framework */; };
 		785ABA952410D8DA00FCD0DE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785ABA942410D8DA00FCD0DE /* AppDelegate.swift */; };
 		785ABA972410D8DA00FCD0DE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785ABA962410D8DA00FCD0DE /* SceneDelegate.swift */; };
@@ -22,6 +23,7 @@
 /* Begin PBXFileReference section */
 		32B5F69633C72A3A1FED9583 /* Pods-FreeMemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FreeMemo.debug.xcconfig"; path = "Target Support Files/Pods-FreeMemo/Pods-FreeMemo.debug.xcconfig"; sourceTree = "<group>"; };
 		7802DA21241374AB00BA33DE /* ComposeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposeViewController.swift; sourceTree = "<group>"; };
+		78042244242DCB3700F9A82A /* AddPictureController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPictureController.swift; sourceTree = "<group>"; };
 		785ABA912410D8DA00FCD0DE /* FreeMemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeMemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		785ABA942410D8DA00FCD0DE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		785ABA962410D8DA00FCD0DE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 				7802DA21241374AB00BA33DE /* ComposeViewController.swift */,
 				78E0D9E12414CCCB000452AD /* PictureCell.swift */,
 				788C49532418D6B800D42A15 /* Model.swift */,
+				78042244242DCB3700F9A82A /* AddPictureController.swift */,
 			);
 			path = FreeMemo;
 			sourceTree = "<group>";
@@ -220,6 +223,7 @@
 				785ABA972410D8DA00FCD0DE /* SceneDelegate.swift in Sources */,
 				788C49542418D6B800D42A15 /* Model.swift in Sources */,
 				78E0D9E22414CCCB000452AD /* PictureCell.swift in Sources */,
+				78042245242DCB3700F9A82A /* AddPictureController.swift in Sources */,
 				789A28A92410F576008DCD4B /* MemoCells.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

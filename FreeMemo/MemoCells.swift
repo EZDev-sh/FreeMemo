@@ -36,6 +36,7 @@ class ImageCell: UITableViewCell {
         content.numberOfLines = 2
         return content
     }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
