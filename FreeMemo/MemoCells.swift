@@ -74,11 +74,8 @@ class ImageCell: UITableViewCell {
             self.contentLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             self.contentLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
             self.contentLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -8)
-            
-            
-            
+
         ])
-        
     }
 }
 

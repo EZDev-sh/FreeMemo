@@ -42,6 +42,9 @@ class MemoListViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        let doc = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+
+        print(doc)
         
         // singleton의 데이터 업데이트
         DataMgr.shared.loadMemoList()

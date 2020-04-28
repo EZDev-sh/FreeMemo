@@ -10,9 +10,6 @@ import RealmSwift
 
 // RealmSwift를 사용한 데이터 모델
 // create by EZDev on 2020.03.15
-
-
-
 class Memo: Object {
     
     @objc dynamic var title: String = ""

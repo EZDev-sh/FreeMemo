@@ -52,7 +52,7 @@ class ComposeViewController: UIViewController {
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.font = UIFont.systemFont(ofSize: 20)
         textView.text = "메모"
-        textView.textColor = .lightGray
+        textView.textColor = .black
         textView.showsVerticalScrollIndicator = false
         return textView
     }()
@@ -122,19 +122,13 @@ class ComposeViewController: UIViewController {
         
         // 초기에 제목을 입력하수 있게 바로 키보드를 올린다.
         // create by EZDev on 2020.03.08
-        titleTextField.becomeFirstResponder()
+        contentTextView.becomeFirstResponder()
         
         // 키보드의 높이를 가져올수 있게 하는 노티를 등록한다
         // create by EZDev on 2020.03.08
         NotificationCenter.default.addObserver(self, selector: #selector(showKeyboard(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         view.endEditing(true)
-        
-//        do {
-//            realm = try Realm()
-//        } catch {
-//            print(error.localizedDescription)
-//        }
         
         // 새로운 매모작성인지 수정인지 확인
         // create by EZDev on 2020.03.23
@@ -263,9 +257,11 @@ extension ComposeViewController: UITextViewDelegate {
             contentTextView.text = "메모"
             contentTextView.textColor = .lightGray
         }
+        else {
+            contentTextView.textColor = .black
+        }
     }
 }
-
 
 // 추가된 이미지가 보여지는 테이블뷰의 데이터, 델리게이트 정의
 // create by EZDev on 2020.03.08
